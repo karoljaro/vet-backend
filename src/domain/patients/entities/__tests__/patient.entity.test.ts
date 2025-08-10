@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { Patient } from '@/domain/patients';
+import { asPatientId } from '@/domain/patients/types/patient.types';
+import { asOwnerId } from '@/domain/owners/types/owner.types';
 import {
   DomainError,
   PatientAlreadyDeceasedError,
@@ -11,12 +13,12 @@ const baseProps = {
   species: 'dog' as const,
   breed: 'Labrador',
   gender: 'male' as const,
-  ownerId: 'owner-1',
+  ownerId: asOwnerId('owner-1'),
 };
 
 describe('Patient Entity', () => {
   it('creates active patient with timestamps', () => {
-    const p = Patient.create('id-1', baseProps);
+    const p = Patient.create(asPatientId('id-1'), baseProps);
     expect(p.isActive()).toBe(true);
     expect(p.createdAt).toBeInstanceOf(Date);
     expect(p.updatedAt).toBeInstanceOf(Date);
@@ -24,14 +26,14 @@ describe('Patient Entity', () => {
   });
 
   it('updates basic info', () => {
-    const p = Patient.create('id-2', baseProps);
+    const p = Patient.create(asPatientId('id-2'), baseProps);
     p.updateBasicInfo({ name: 'Reksio', weight: 12 });
     expect(p.name).toBe('Reksio');
     expect(p.weight).toBe(12);
   });
 
   it('marks as deceased and prevents updates', () => {
-    const p = Patient.create('id-3', baseProps);
+    const p = Patient.create(asPatientId('id-3'), baseProps);
     p.markAsDeceased();
     expect(p.isDeceased()).toBe(true);
     expect(() => p.updateBasicInfo({ name: 'X' })).toThrowError(PatientUpdateNotAllowedError);
@@ -44,7 +46,7 @@ describe('Patient Entity', () => {
   });
 
   it('cannot mark as deceased twice', () => {
-    const p = Patient.create('id-5', baseProps);
+    const p = Patient.create(asPatientId('id-5'), baseProps);
     p.markAsDeceased();
     expect(() => p.markAsDeceased()).toThrowError(PatientAlreadyDeceasedError);
   });
@@ -52,7 +54,7 @@ describe('Patient Entity', () => {
   it('calculates age when dateOfBirth is set', () => {
     const dob = new Date();
     dob.setFullYear(dob.getFullYear() - 5);
-    const p = Patient.create('id-4', { ...baseProps, dateOfBirth: dob });
+    const p = Patient.create(asPatientId('id-4'), { ...baseProps, dateOfBirth: dob });
     expect(p.calculateAge()).toBeGreaterThanOrEqual(4);
   });
 });

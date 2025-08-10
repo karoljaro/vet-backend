@@ -1,4 +1,5 @@
-export type OwnerId = string;
+export type OwnerId = string & { readonly __brand: 'OwnerId' };
+export const asOwnerId = (id: string): OwnerId => id as OwnerId;
 
 export type OwnerStatus = 'active' | 'inactive';
 

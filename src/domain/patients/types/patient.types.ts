@@ -1,6 +1,10 @@
+import { OwnerId } from '@/domain/owners';
+
 export type Species = 'dog' | 'cat' | (string & {});
 export type Gender = 'male' | 'female';
 export type PatientStatus = 'active' | 'deceased';
+export type PatientId = string & { readonly __brand: 'PatientId' };
+export const asPatientId = (id: string): PatientId => id as PatientId;
 
 export interface PatientProps {
   // Core identity
@@ -15,7 +19,7 @@ export interface PatientProps {
   photoUrl?: string;
 
   // Ownership
-  ownerId: string;
+  ownerId: OwnerId;
 
   // Status
   status: PatientStatus;
@@ -30,7 +34,7 @@ export interface CreatePatientProps {
   species: Species;
   breed: string;
   gender: Gender;
-  ownerId: string;
+  ownerId: OwnerId;
   dateOfBirth?: Date;
   weight?: number;
   photoUrl?: string;

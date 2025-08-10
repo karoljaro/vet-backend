@@ -1,14 +1,24 @@
 import { OwnerBusinessValidator } from '@/domain/owners/validators/owner-business.validator';
-import { OwnerProps, CreateOwnerProps, UpdateOwnerProps, OwnerStatus } from '@/domain/owners/types/owner.types';
-import { InvalidTimestampsOrderError, OwnerAlreadyActiveError, OwnerAlreadyInactiveError } from '@/domain/shared';
+import {
+  OwnerProps,
+  CreateOwnerProps,
+  UpdateOwnerProps,
+  OwnerStatus,
+  OwnerId,
+} from '@/domain/owners/types/owner.types';
+import {
+  InvalidTimestampsOrderError,
+  OwnerAlreadyActiveError,
+  OwnerAlreadyInactiveError,
+} from '@/domain/shared';
 
 export class Owner {
   private constructor(
-    public readonly id: string,
+    public readonly id: OwnerId,
     private _props: OwnerProps
   ) {}
 
-  static create(id: string, props: CreateOwnerProps): Owner {
+  static create(id: OwnerId, props: CreateOwnerProps): Owner {
     OwnerBusinessValidator.validateName(props.name);
     OwnerBusinessValidator.validateEmail(props.email);
     OwnerBusinessValidator.validatePhone(props.phone);

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { PatientInvariantsValidator } from '@/domain/patients';
 import { CreatePatientProps, PatientProps } from '@/domain/patients';
+import { asOwnerId } from '@/domain/owners/types/owner.types';
 import { DomainError, InvalidTimestampsOrderError, MissingOwnerError } from '@/domain/shared';
 
 describe('PatientInvariantsValidator', () => {
@@ -10,7 +11,7 @@ describe('PatientInvariantsValidator', () => {
       species: 'dog',
       breed: 'Labrador',
       gender: 'male',
-      ownerId: 'owner-1',
+      ownerId: asOwnerId('owner-1'),
       weight: 10,
     };
     expect(() => PatientInvariantsValidator.validateCreateProps(props)).not.toThrow();
@@ -22,7 +23,7 @@ describe('PatientInvariantsValidator', () => {
       species: 'dog',
       breed: 'Labrador',
       gender: 'male',
-      ownerId: '',
+      ownerId: asOwnerId(''),
     };
     expect(() => PatientInvariantsValidator.validateCreateProps(props)).toThrowError(
       MissingOwnerError
@@ -45,7 +46,7 @@ describe('PatientInvariantsValidator', () => {
       species: 'dog',
       breed: 'Labrador',
       gender: 'male',
-      ownerId: 'owner-1',
+      ownerId: asOwnerId('owner-1'),
       status: 'active',
       createdAt: later,
       updatedAt: earlier,

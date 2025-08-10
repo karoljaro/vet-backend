@@ -1,3 +1,4 @@
+import { OwnerId } from '@/domain/owners';
 import {
   PatientProps,
   CreatePatientProps,
@@ -5,6 +6,7 @@ import {
   Species,
   Gender,
   PatientStatus,
+  PatientId,
 } from '../types';
 import { PatientInvariantsValidator } from '../validators';
 import { PatientAlreadyDeceasedError, PatientUpdateNotAllowedError } from '@/domain/shared';
@@ -13,14 +15,14 @@ export class Patient {
   private props: Readonly<PatientProps>;
 
   private constructor(
-    public readonly id: string,
+    public readonly id: PatientId,
     props: PatientProps
   ) {
     PatientInvariantsValidator.validatePatientProps(props);
     this.props = Object.freeze({ ...props });
   }
 
-  static create(id: string, createProps: CreatePatientProps): Patient {
+  static create(id: PatientId, createProps: CreatePatientProps): Patient {
     PatientInvariantsValidator.validateCreateProps(createProps);
 
     const props: PatientProps = {
@@ -53,7 +55,7 @@ export class Patient {
   get gender(): Gender {
     return this.props.gender;
   }
-  get ownerId(): string {
+  get ownerId(): OwnerId {
     return this.props.ownerId;
   }
   get dateOfBirth(): Date | undefined {
