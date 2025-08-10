@@ -1,4 +1,8 @@
-import { InvalidOwnerNameError, InvalidOwnerEmailError, InvalidOwnerPhoneError } from '@/domain/shared';
+import {
+  InvalidOwnerNameError,
+  InvalidOwnerEmailError,
+  InvalidOwnerPhoneError,
+} from '@/domain/shared';
 
 export class OwnerBusinessValidator {
   static validateName(name: string): void {
