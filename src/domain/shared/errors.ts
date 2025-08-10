@@ -53,3 +53,36 @@ export class InvalidTimestampsOrderError extends DomainError {
     super('INVALID_TIMESTAMPS_ORDER', 'Updated date cannot be before created date');
   }
 }
+
+// Owner-related errors
+export class InvalidOwnerNameError extends DomainError {
+  constructor() {
+    super('INVALID_OWNER_NAME', 'Owner name cannot be empty or too long');
+  }
+}
+
+export class InvalidOwnerEmailError extends DomainError {
+  constructor() {
+    super('INVALID_OWNER_EMAIL', 'Owner email is invalid');
+  }
+}
+
+export class InvalidOwnerPhoneError extends DomainError {
+  constructor(reason: 'length' | 'format') {
+    const message =
+      reason === 'length' ? 'Owner phone must have 7-20 digits' : 'Owner phone has invalid format';
+    super('INVALID_OWNER_PHONE', message);
+  }
+}
+
+export class OwnerAlreadyInactiveError extends DomainError {
+  constructor() {
+    super('OWNER_ALREADY_INACTIVE', 'Owner is already inactive');
+  }
+}
+
+export class OwnerAlreadyActiveError extends DomainError {
+  constructor() {
+    super('OWNER_ALREADY_ACTIVE', 'Owner is already active');
+  }
+}
