@@ -57,4 +57,21 @@ describe('Patient Entity', () => {
     const p = Patient.create(asPatientId('id-4'), { ...baseProps, dateOfBirth: dob });
     expect(p.calculateAge()).toBeGreaterThanOrEqual(4);
   });
+
+  it('records and drains domain events on markAsDeceased', () => {
+    const p = Patient.create(asPatientId('id-6'), baseProps);
+    // before any change, buffer should be empty
+    expect(p.pullDomainEvents()).toHaveLength(0);
+
+    p.markAsDeceased();
+  const events1 = p.pullDomainEvents();
+  expect(events1).toHaveLength(1);
+  const evt = events1[0]!;
+  expect(evt.type).toBe('PatientDeceased');
+  expect(evt.occurredAt).toBeInstanceOf(Date);
+
+    // buffer is drained
+    const events2 = p.pullDomainEvents();
+    expect(events2).toHaveLength(0);
+  });
 });

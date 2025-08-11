@@ -9,10 +9,15 @@ import {
   PatientId,
 } from '../types';
 import { PatientInvariantsValidator } from '../validators';
-import { PatientAlreadyDeceasedError, PatientUpdateNotAllowedError } from '@/domain/shared';
+import {
+  PatientAlreadyDeceasedError,
+  PatientUpdateNotAllowedError,
+  DomainEvent,
+} from '@/domain/shared';
 
 export class Patient {
   private props: Readonly<PatientProps>;
+  private _events: DomainEvent[] = [];
 
   private constructor(
     public readonly id: PatientId,
@@ -107,6 +112,10 @@ export class Patient {
     };
     PatientInvariantsValidator.validatePatientProps(next);
     this.props = Object.freeze({ ...next });
+    this._events.push({
+      type: 'PatientDeceased',
+      occurredAt: new Date(),
+    });
   }
 
   // Query methods
@@ -131,5 +140,12 @@ export class Patient {
     }
 
     return age;
+  }
+
+  // Domain events recorder
+  pullDomainEvents(): DomainEvent[] {
+    const out = this._events.slice();
+    this._events.length = 0;
+    return out;
   }
 }
