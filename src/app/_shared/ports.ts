@@ -1,5 +1,7 @@
 import type { PatientId } from '@/domain/patients/types';
 import type { Patient } from '@/domain/patients';
+import type { OwnerId } from '@/domain/owners/types/owner.types';
+import type { Owner } from '@/domain/owners';
 import type { EventEnvelope } from '@/app/_shared/events';
 
 export interface UnitOfWork {
@@ -20,4 +22,9 @@ export interface PatientRepository {
 
 export interface EventPublisher {
   publishAll(envelopes: EventEnvelope[]): Promise<void>;
+}
+
+export interface OwnerRepository {
+  getById(id: OwnerId, ctx?: unknown): Promise<{ entity: Owner }>
+  save(entity: Owner, ctx?: unknown): Promise<void>
 }
