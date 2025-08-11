@@ -9,7 +9,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "bun": "^1.2.19",
+    "bun": "latest",
     "dotenv": "^17.2.1",
     "drizzle-orm": "^0.44.4",
     "elysia": "latest",
