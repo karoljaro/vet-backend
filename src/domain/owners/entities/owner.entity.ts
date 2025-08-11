@@ -10,9 +10,11 @@ import {
   InvalidTimestampsOrderError,
   OwnerAlreadyActiveError,
   OwnerAlreadyInactiveError,
+  DomainEvent,
 } from '@/domain/shared';
 
 export class Owner {
+  private _events: DomainEvent[] = [];
   private constructor(
     public readonly id: OwnerId,
     private _props: OwnerProps
@@ -62,6 +64,7 @@ export class Owner {
       throw new OwnerAlreadyInactiveError();
     }
     this.transitionStatus('inactive');
+  this._events.push({ type: 'OwnerDeactivated', occurredAt: new Date() });
   }
 
   activate(): void {
@@ -69,6 +72,7 @@ export class Owner {
       throw new OwnerAlreadyActiveError();
     }
     this.transitionStatus('active');
+  this._events.push({ type: 'OwnerActivated', occurredAt: new Date() });
   }
 
   private transitionStatus(status: OwnerStatus): void {
@@ -111,5 +115,12 @@ export class Owner {
   }
   isActive() {
     return this._props.status === 'active';
+  }
+
+  // Domain events recorder
+  pullDomainEvents(): DomainEvent[] {
+    const out = this._events.slice();
+    this._events.length = 0;
+    return out;
   }
 }

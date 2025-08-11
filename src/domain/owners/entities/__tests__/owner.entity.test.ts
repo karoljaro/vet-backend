@@ -28,4 +28,27 @@ describe('Owner Entity', () => {
     expect(o.isActive()).toBe(true);
     expect(() => o.activate()).toThrowError(OwnerAlreadyActiveError);
   });
+
+  it('records and drains domain events on status transitions', () => {
+    const o = Owner.create(asOwnerId('owner-4'), { name: 'Ola' });
+    // initial buffer empty
+    expect(o.pullDomainEvents()).toHaveLength(0);
+
+    o.deactivate();
+    const events1 = o.pullDomainEvents();
+    expect(events1).toHaveLength(1);
+    const e1 = events1[0]!;
+    expect(e1.type).toBe('OwnerDeactivated');
+    expect(e1.occurredAt).toBeInstanceOf(Date);
+
+    o.activate();
+    const events2 = o.pullDomainEvents();
+    expect(events2).toHaveLength(1);
+    const e2 = events2[0]!;
+    expect(e2.type).toBe('OwnerActivated');
+    expect(e2.occurredAt).toBeInstanceOf(Date);
+
+    // drained
+    expect(o.pullDomainEvents()).toHaveLength(0);
+  });
 });
