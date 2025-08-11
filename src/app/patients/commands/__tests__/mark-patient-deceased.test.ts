@@ -1,0 +1,42 @@
+import { describe, it, expect, vi } from 'vitest';
+import { markPatientDeceased } from '@/app/patients/commands/mark-patient-deceased';
+import { Patient } from '@/domain/patients';
+import { asPatientId } from '@/domain/patients/types/patient.types';
+import { asOwnerId } from '@/domain/owners/types/owner.types';
+import { EventEnvelope } from '@/app/_shared/events';
+
+function makePatient() {
+  return Patient.create(asPatientId('p-1'), {
+    name: 'Burek',
+    species: 'dog',
+    breed: 'Labrador',
+    gender: 'male',
+    ownerId: asOwnerId('o-1'),
+  });
+}
+
+describe('markPatientDeceased (app)', () => {
+  it('saves aggregate and publishes envelope with aggregateId', async () => {
+    const patient = makePatient();
+    const repo = {
+      getById: vi.fn(async () => ({ entity: patient })),
+      save: vi.fn(async () => {}),
+    };
+    const published: EventEnvelope[] = [];
+    const publisher = {
+      publishAll: vi.fn(async (envs: EventEnvelope[]) => {
+        published.push(...envs);
+      }),
+    };
+
+    await markPatientDeceased(asPatientId('p-1'), { repo, publisher });
+
+    expect(repo.getById).toHaveBeenCalledOnce();
+    expect(repo.save).toHaveBeenCalledOnce();
+    expect(published.length).toBe(1);
+    const first = published[0]!;
+    expect(first.aggregateId).toBe('p-1');
+    expect(first.aggregateType).toBe('Patient');
+    expect(first.type).toBe('PatientDeceased');
+  });
+});
