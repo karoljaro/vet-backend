@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { markPatientDeceased } from '@/app/patients/commands/mark-patient-deceased';
+import { NoopUnitOfWork } from '@/app/_shared/ports';
 import { Patient } from '@/domain/patients';
 import { asPatientId } from '@/domain/patients/types/patient.types';
 import { asOwnerId } from '@/domain/owners/types/owner.types';
@@ -29,7 +30,8 @@ describe('markPatientDeceased (app)', () => {
       }),
     };
 
-    await markPatientDeceased(asPatientId('p-1'), { repo, publisher });
+    const uow = new NoopUnitOfWork();
+    await markPatientDeceased(asPatientId('p-1'), { repo, publisher, uow });
 
     expect(repo.getById).toHaveBeenCalledOnce();
     expect(repo.save).toHaveBeenCalledOnce();

@@ -1,23 +1,26 @@
 import type { OwnerId } from '@/domain/owners/types/owner.types';
 import type { EventEnvelope } from '@/app/_shared/events';
-import type { EventPublisher, OwnerRepository } from '@/app/_shared/ports';
+import type { EventPublisher, OwnerRepository, UnitOfWork } from '@/app/_shared/ports';
 
 export async function activateOwner(
   id: OwnerId,
-  deps: { repo: OwnerRepository; publisher: EventPublisher }
+  deps: { repo: OwnerRepository; publisher: EventPublisher; uow: UnitOfWork }
 ) {
-  const { repo, publisher } = deps;
-  const { entity } = await repo.getById(id);
+  const { repo, publisher, uow } = deps;
 
-  entity.activate();
-  await repo.save(entity);
+  await uow.withTransaction(async (tx) => {
+    const { entity } = await repo.getById(id, tx);
 
-  const envelopes: EventEnvelope[] = entity.pullDomainEvents().map((e) => ({
-    type: e.type,
-    occurredAt: e.occurredAt,
-    aggregateId: id,
-    aggregateType: 'Owner',
-  }));
+    entity.activate();
+    await repo.save(entity, tx);
 
-  await publisher.publishAll(envelopes);
+    const envelopes: EventEnvelope[] = entity.pullDomainEvents().map((e) => ({
+      type: e.type,
+      occurredAt: e.occurredAt,
+      aggregateId: id,
+      aggregateType: 'Owner',
+    }));
+
+    await publisher.publishAll(envelopes);
+  });
 }

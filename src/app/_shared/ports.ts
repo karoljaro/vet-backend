@@ -4,8 +4,12 @@ import type { OwnerId } from '@/domain/owners/types/owner.types';
 import type { Owner } from '@/domain/owners';
 import type { EventEnvelope } from '@/app/_shared/events';
 
+export interface TransactionContext {
+  // will hold db transaction / context later
+}
+
 export interface UnitOfWork {
-  withTransaction<T>(fn: (ctx: unknown) => Promise<T>): Promise<T>;
+  withTransaction<T>(fn: (ctx: TransactionContext) => Promise<T>): Promise<T>;
 }
 
 export interface Clock {
@@ -16,8 +20,8 @@ export interface IdGenerator {
 }
 
 export interface PatientRepository {
-  getById(id: PatientId, ctx?: unknown): Promise<{ entity: Patient }>;
-  save(entity: Patient, ctx?: unknown): Promise<void>;
+  getById(id: PatientId, ctx?: TransactionContext): Promise<{ entity: Patient }>;
+  save(entity: Patient, ctx?: TransactionContext): Promise<void>;
 }
 
 export interface EventPublisher {
@@ -25,6 +29,12 @@ export interface EventPublisher {
 }
 
 export interface OwnerRepository {
-  getById(id: OwnerId, ctx?: unknown): Promise<{ entity: Owner }>
-  save(entity: Owner, ctx?: unknown): Promise<void>
+  getById(id: OwnerId, ctx?: TransactionContext): Promise<{ entity: Owner }>;
+  save(entity: Owner, ctx?: TransactionContext): Promise<void>;
+}
+
+export class NoopUnitOfWork implements UnitOfWork {
+  async withTransaction<T>(fn: (ctx: TransactionContext) => Promise<T>): Promise<T> {
+    return fn({} as TransactionContext);
+  }
 }
