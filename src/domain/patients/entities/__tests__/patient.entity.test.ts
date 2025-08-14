@@ -64,11 +64,11 @@ describe('Patient Entity', () => {
     expect(p.pullDomainEvents()).toHaveLength(0);
 
     p.markAsDeceased();
-  const events1 = p.pullDomainEvents();
-  expect(events1).toHaveLength(1);
-  const evt = events1[0]!;
-  expect(evt.type).toBe('PatientDeceased');
-  expect(evt.occurredAt).toBeInstanceOf(Date);
+    const events1 = p.pullDomainEvents();
+    expect(events1).toHaveLength(1);
+    const evt = events1[0]!;
+    expect(evt.type).toBe('PatientDeceased');
+    expect(evt.occurredAt).toBeInstanceOf(Date);
 
     // buffer is drained
     const events2 = p.pullDomainEvents();
