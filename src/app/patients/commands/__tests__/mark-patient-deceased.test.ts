@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { markPatientDeceased } from '@/app/patients/commands/mark-patient-deceased';
 import { NoopUnitOfWork } from '@/app/_shared/ports';
+import { InMemoryOutboxRepository } from '@/app/_shared/outbox/in-memory-outbox.repository';
 import { Patient } from '@/domain/patients';
 import { asPatientId } from '@/domain/patients/types/patient.types';
 import { asOwnerId } from '@/domain/owners/types/owner.types';
@@ -31,7 +32,11 @@ describe('markPatientDeceased (app)', () => {
     };
 
     const uow = new NoopUnitOfWork();
-    await markPatientDeceased(asPatientId('p-1'), { repo, publisher, uow });
+    const outbox = new InMemoryOutboxRepository();
+    await markPatientDeceased(asPatientId('p-1'), { repo, publisher, outbox, uow });
+
+    // ensure event first stored to outbox (in this impl publish runs after commit so both true)
+    expect(outbox.peek().length).toBe(1);
 
     expect(repo.getById).toHaveBeenCalledOnce();
     expect(repo.save).toHaveBeenCalledOnce();

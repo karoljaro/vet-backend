@@ -10,6 +10,7 @@ export interface TransactionContext {
 
 export interface UnitOfWork {
   withTransaction<T>(fn: (ctx: TransactionContext) => Promise<T>): Promise<T>;
+  afterCommit?(fn: () => Promise<void> | void): void;
 }
 
 export interface Clock {
@@ -28,13 +29,27 @@ export interface EventPublisher {
   publishAll(envelopes: EventEnvelope[]): Promise<void>;
 }
 
+export interface OutboxRepository {
+  append(envelopes: EventEnvelope[], ctx?: TransactionContext): Promise<void>;
+  // future: fetchPending(batchSize), markDispatched(ids)
+}
+
 export interface OwnerRepository {
   getById(id: OwnerId, ctx?: TransactionContext): Promise<{ entity: Owner }>;
   save(entity: Owner, ctx?: TransactionContext): Promise<void>;
 }
 
+// TEMP: in-memory placeholder; move to infra + tests layer later
 export class NoopUnitOfWork implements UnitOfWork {
+  private _queue: Array<() => Promise<void> | void> = [];
+  afterCommit(fn: () => Promise<void> | void) {
+    this._queue.push(fn);
+  }
   async withTransaction<T>(fn: (ctx: TransactionContext) => Promise<T>): Promise<T> {
-    return fn({} as TransactionContext);
+    this._queue = [];
+    const result = await fn({} as TransactionContext);
+    // simulate post-commit
+    for (const f of this._queue) await f();
+    return result;
   }
 }

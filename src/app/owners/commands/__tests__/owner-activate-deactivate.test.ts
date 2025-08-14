@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { activateOwner } from '@/app/owners/commands/activate-owner';
 import { deactivateOwner } from '@/app/owners/commands/deactivate-owner';
 import { NoopUnitOfWork } from '@/app/_shared/ports';
+import { InMemoryOutboxRepository } from '@/app/_shared/outbox/in-memory-outbox.repository';
 import { Owner } from '@/domain/owners';
 import { asOwnerId } from '@/domain/owners/types/owner.types';
 import { EventEnvelope } from '@/app/_shared/events';
@@ -25,8 +26,11 @@ describe('Owner activate/deactivate (app)', () => {
     };
 
     const uow = new NoopUnitOfWork();
-    await deactivateOwner(asOwnerId('o-1'), { repo, publisher, uow } as any);
-    await activateOwner(asOwnerId('o-1'), { repo, publisher, uow } as any);
+    const outbox = new InMemoryOutboxRepository();
+    await deactivateOwner(asOwnerId('o-1'), { repo, publisher, outbox, uow });
+    await activateOwner(asOwnerId('o-1'), { repo, publisher, outbox, uow });
+
+    expect(outbox.peek().length).toBe(2);
 
     expect(repo.getById).toHaveBeenCalledTimes(2);
     expect(repo.save).toHaveBeenCalledTimes(2);
