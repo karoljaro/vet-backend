@@ -64,7 +64,7 @@ export class Owner {
       throw new OwnerAlreadyInactiveError();
     }
     this.transitionStatus('inactive');
-  this._events.push({ type: 'OwnerDeactivated', occurredAt: new Date() });
+    this._events.push({ type: 'OwnerDeactivated', occurredAt: new Date() });
   }
 
   activate(): void {
@@ -72,7 +72,7 @@ export class Owner {
       throw new OwnerAlreadyActiveError();
     }
     this.transitionStatus('active');
-  this._events.push({ type: 'OwnerActivated', occurredAt: new Date() });
+    this._events.push({ type: 'OwnerActivated', occurredAt: new Date() });
   }
 
   private transitionStatus(status: OwnerStatus): void {
