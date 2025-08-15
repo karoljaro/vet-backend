@@ -27,11 +27,7 @@ export class InMemoryOutboxRepository implements OutboxRepository {
   async markDispatched(ids: string[], _ctx?: TransactionContext): Promise<void> {
     const set = new Set(ids);
     for (const s of this.store) {
-      if (
-        set.has(
-          s.envelope.aggregateId + ':' + s.envelope.type + ':' + s.envelope.occurredAt.getTime()
-        )
-      ) {
+      if (set.has(s.envelope.envelopeId)) {
         s.dispatched = true;
       }
     }

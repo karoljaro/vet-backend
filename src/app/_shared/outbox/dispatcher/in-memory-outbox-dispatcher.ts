@@ -16,7 +16,7 @@ export class InMemoryOutboxDispatcher {
 
     await this.publisher.publishAll(pending);
 
-    const ids = pending.map((e) => this._compositeId(e));
+  const ids = pending.map((e) => e.envelopeId);
     await this.outbox.markDispatched(ids);
     return pending.length;
   }
@@ -29,9 +29,5 @@ export class InMemoryOutboxDispatcher {
       if (n === 0) break;
     }
     return total;
-  }
-
-  private _compositeId(e: EventEnvelope): string {
-    return e.aggregateId + ':' + e.type + ':' + e.occurredAt.getTime();
   }
 }
