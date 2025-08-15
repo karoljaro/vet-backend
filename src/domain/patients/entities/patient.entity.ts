@@ -42,6 +42,7 @@ export class Patient {
       status: 'active',
       createdAt: new Date(),
       updatedAt: new Date(),
+      version: 1,
     };
 
     return new Patient(id, props);
@@ -81,6 +82,9 @@ export class Patient {
   get updatedAt(): Date {
     return new Date(this.props.updatedAt);
   }
+  get version(): number {
+    return this.props.version;
+  }
 
   // Business methods
   updateBasicInfo(updates: UpdatePatientBasicInfoProps): void {
@@ -95,6 +99,7 @@ export class Patient {
       ...(updates.weight !== undefined ? { weight: updates.weight } : {}),
       ...(updates.photoUrl !== undefined ? { photoUrl: updates.photoUrl } : {}),
       updatedAt: new Date(),
+      version: this.props.version + 1,
     };
 
     PatientInvariantsValidator.validatePatientProps(next);
@@ -109,6 +114,7 @@ export class Patient {
       ...this.props,
       status: 'deceased',
       updatedAt: new Date(),
+      version: this.props.version + 1,
     };
     PatientInvariantsValidator.validatePatientProps(next);
     this.props = Object.freeze({ ...next });
