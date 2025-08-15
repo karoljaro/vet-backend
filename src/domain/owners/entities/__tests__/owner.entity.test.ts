@@ -10,6 +10,7 @@ describe('Owner Entity', () => {
     expect(o.createdAt).toBeInstanceOf(Date);
     expect(o.updatedAt).toBeInstanceOf(Date);
     expect(o.name).toBe('Jan Kowalski');
+    expect(o.version).toBe(1);
   });
 
   it('updates basic fields and preserves invariants', () => {
@@ -17,15 +18,18 @@ describe('Owner Entity', () => {
     o.update({ name: 'Jan Nowak', phone: '+48 123 456 789' });
     expect(o.name).toBe('Jan Nowak');
     expect(o.phone).toContain('123');
+    expect(o.version).toBe(2);
   });
 
   it('deactivates and prevents double deactivation/activation', () => {
     const o = Owner.create(asOwnerId('owner-3'), { name: 'Anna' });
     o.deactivate();
     expect(o.isActive()).toBe(false);
+    expect(o.version).toBe(2);
     expect(() => o.deactivate()).toThrowError(OwnerAlreadyInactiveError);
     o.activate();
     expect(o.isActive()).toBe(true);
+    expect(o.version).toBe(3);
     expect(() => o.activate()).toThrowError(OwnerAlreadyActiveError);
   });
 
@@ -40,6 +44,7 @@ describe('Owner Entity', () => {
     const e1 = events1[0]!;
     expect(e1.type).toBe('OwnerDeactivated');
     expect(e1.occurredAt).toBeInstanceOf(Date);
+    expect(o.version).toBe(2);
 
     o.activate();
     const events2 = o.pullDomainEvents();
@@ -47,6 +52,7 @@ describe('Owner Entity', () => {
     const e2 = events2[0]!;
     expect(e2.type).toBe('OwnerActivated');
     expect(e2.occurredAt).toBeInstanceOf(Date);
+    expect(o.version).toBe(3);
 
     // drained
     expect(o.pullDomainEvents()).toHaveLength(0);

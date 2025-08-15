@@ -23,6 +23,7 @@ describe('Patient Entity', () => {
     expect(p.createdAt).toBeInstanceOf(Date);
     expect(p.updatedAt).toBeInstanceOf(Date);
     expect(p.name).toBe('Burek');
+    expect(p.version).toBe(1);
   });
 
   it('updates basic info', () => {
@@ -30,12 +31,14 @@ describe('Patient Entity', () => {
     p.updateBasicInfo({ name: 'Reksio', weight: 12 });
     expect(p.name).toBe('Reksio');
     expect(p.weight).toBe(12);
+    expect(p.version).toBe(2);
   });
 
   it('marks as deceased and prevents updates', () => {
     const p = Patient.create(asPatientId('id-3'), baseProps);
     p.markAsDeceased();
     expect(p.isDeceased()).toBe(true);
+    expect(p.version).toBe(2);
     expect(() => p.updateBasicInfo({ name: 'X' })).toThrowError(PatientUpdateNotAllowedError);
     try {
       p.updateBasicInfo({ name: 'X' });
