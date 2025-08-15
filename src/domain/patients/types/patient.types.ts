@@ -27,6 +27,8 @@ export interface PatientProps {
   // Audit
   createdAt: Date;
   updatedAt: Date;
+  // Concurrency / versioning
+  version: number;
 }
 
 export interface CreatePatientProps {

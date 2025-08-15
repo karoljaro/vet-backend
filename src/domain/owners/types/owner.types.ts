@@ -11,6 +11,7 @@ export interface OwnerProps {
   status: OwnerStatus;
   createdAt: Date;
   updatedAt: Date;
+  version: number; // optimistic concurrency version
 }
 
 export type CreateOwnerProps = {

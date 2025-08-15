@@ -34,6 +34,7 @@ export class Owner {
       status: 'active',
       createdAt: now,
       updatedAt: now,
+      version: 1,
     } as OwnerProps);
 
     const owner = new Owner(id, domainProps);
@@ -53,6 +54,7 @@ export class Owner {
       ...(updates.phone !== undefined ? { phone: updates.phone } : {}),
       ...(updates.address !== undefined ? { address: updates.address } : {}),
       updatedAt: new Date(),
+      version: this._props.version + 1,
     });
 
     Owner.ensureTimestampsOrder(newProps.createdAt, newProps.updatedAt);
@@ -80,6 +82,7 @@ export class Owner {
       ...this._props,
       status,
       updatedAt: new Date(),
+      version: this._props.version + 1,
     });
     Owner.ensureTimestampsOrder(newProps.createdAt, newProps.updatedAt);
     this._props = newProps;
@@ -112,6 +115,9 @@ export class Owner {
   }
   get updatedAt() {
     return new Date(this._props.updatedAt);
+  }
+  get version() {
+    return this._props.version;
   }
   isActive() {
     return this._props.status === 'active';
