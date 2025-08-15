@@ -1,22 +1,12 @@
 import type { OwnerId } from '@/domain/owners/types/owner.types';
 import { mapDomainEventsToEnvelopes } from '@/app/_shared/mappers/events.mapper';
-import type {
-  EventPublisher,
-  OwnerRepository,
-  UnitOfWork,
-  OutboxRepository,
-} from '@/app/_shared/ports';
+import type { OwnerRepository, UnitOfWork, OutboxRepository } from '@/app/_shared/ports';
 
 export async function activateOwner(
   id: OwnerId,
-  deps: {
-    repo: OwnerRepository;
-    publisher: EventPublisher;
-    outbox: OutboxRepository;
-    uow: UnitOfWork;
-  }
+  deps: { repo: OwnerRepository; outbox: OutboxRepository; uow: UnitOfWork }
 ) {
-  const { repo, publisher: _publisher, outbox, uow } = deps;
+  const { repo, outbox, uow } = deps;
 
   await uow.withTransaction(async (tx) => {
     const { entity } = await repo.getById(id, tx);

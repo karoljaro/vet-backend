@@ -16,7 +16,7 @@ export class InMemoryOutboxDispatcher {
 
     await this.publisher.publishAll(pending);
 
-  const ids = pending.map((e) => e.envelopeId);
+    const ids = pending.map((e) => e.envelopeId);
     await this.outbox.markDispatched(ids);
     return pending.length;
   }

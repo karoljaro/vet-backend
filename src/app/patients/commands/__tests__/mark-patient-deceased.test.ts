@@ -5,7 +5,6 @@ import { InMemoryOutboxRepository } from '@/app/_shared/outbox/in-memory-outbox.
 import { Patient } from '@/domain/patients';
 import { asPatientId } from '@/domain/patients/types/patient.types';
 import { asOwnerId } from '@/domain/owners/types/owner.types';
-import { EventEnvelope } from '@/app/_shared/events';
 
 function makePatient() {
   return Patient.create(asPatientId('p-1'), {
@@ -24,11 +23,11 @@ describe('markPatientDeceased (app)', () => {
       getById: vi.fn(async () => ({ entity: patient })),
       save: vi.fn(async () => {}),
     };
-    const publisher = { publishAll: vi.fn(async (_: EventEnvelope[]) => {}) };
+    // publisher usunięty z handlerów
 
     const uow = new NoopUnitOfWork();
     const outbox = new InMemoryOutboxRepository();
-    await markPatientDeceased(asPatientId('p-1'), { repo, publisher, outbox, uow });
+    await markPatientDeceased(asPatientId('p-1'), { repo, outbox, uow });
 
     // ensure event first stored to outbox (in this impl publish runs after commit so both true)
     expect(outbox.peek().pending.length).toBe(1);
@@ -36,6 +35,6 @@ describe('markPatientDeceased (app)', () => {
 
     expect(repo.getById).toHaveBeenCalledOnce();
     expect(repo.save).toHaveBeenCalledOnce();
-    expect(publisher.publishAll).not.toHaveBeenCalled();
+    // brak publishera
   });
 });

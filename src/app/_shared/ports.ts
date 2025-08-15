@@ -24,6 +24,7 @@ export interface PatientRepository {
   save(entity: Patient, ctx?: TransactionContext): Promise<void>;
 }
 
+// EventPublisher pozostaje portem ale nie jest aktualnie używany w command handlerach
 export interface EventPublisher {
   publishAll(envelopes: EventEnvelope[]): Promise<void>;
 }

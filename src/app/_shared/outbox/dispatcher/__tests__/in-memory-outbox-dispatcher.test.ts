@@ -3,8 +3,15 @@ import { InMemoryOutboxRepository } from '@/app/_shared/outbox/in-memory-outbox.
 import { InMemoryOutboxDispatcher } from '@/app/_shared/outbox/dispatcher/in-memory-outbox-dispatcher';
 import type { EventEnvelope } from '@/app/_shared/events';
 
+let _seq = 0;
+function nextId() {
+  _seq += 1;
+  return `env-${_seq}`;
+}
+
 function makeEnvelope(overrides: Partial<EventEnvelope> = {}): EventEnvelope {
   return {
+    envelopeId: overrides.envelopeId ?? nextId(),
     type: 'TestEvent',
     occurredAt: overrides.occurredAt ?? new Date(),
     aggregateId: overrides.aggregateId ?? 'agg-1',
