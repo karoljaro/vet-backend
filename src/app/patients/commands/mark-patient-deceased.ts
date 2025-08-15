@@ -17,7 +17,7 @@ export async function markPatientDeceased(
     uow: UnitOfWork;
   }
 ) {
-  const { repo, publisher, outbox, uow } = deps;
+  const { repo, publisher: _publisher, outbox, uow } = deps;
 
   await uow.withTransaction(async (tx) => {
     const { entity: patient } = await repo.getById(id, tx);
@@ -27,8 +27,5 @@ export async function markPatientDeceased(
 
     const envelopes = mapDomainEventsToEnvelopes(patient.pullDomainEvents(), id, 'Patient');
     await outbox.append(envelopes, tx);
-    uow.afterCommit?.(async () => {
-      await publisher.publishAll(envelopes);
-    });
   });
 }

@@ -24,26 +24,18 @@ describe('markPatientDeceased (app)', () => {
       getById: vi.fn(async () => ({ entity: patient })),
       save: vi.fn(async () => {}),
     };
-    const published: EventEnvelope[] = [];
-    const publisher = {
-      publishAll: vi.fn(async (envs: EventEnvelope[]) => {
-        published.push(...envs);
-      }),
-    };
+    const publisher = { publishAll: vi.fn(async (_: EventEnvelope[]) => {}) };
 
     const uow = new NoopUnitOfWork();
     const outbox = new InMemoryOutboxRepository();
     await markPatientDeceased(asPatientId('p-1'), { repo, publisher, outbox, uow });
 
     // ensure event first stored to outbox (in this impl publish runs after commit so both true)
-    expect(outbox.peek().length).toBe(1);
+    expect(outbox.peek().pending.length).toBe(1);
+    expect(outbox.peek().dispatched.length).toBe(0);
 
     expect(repo.getById).toHaveBeenCalledOnce();
     expect(repo.save).toHaveBeenCalledOnce();
-    expect(published.length).toBe(1);
-    const first = published[0]!;
-    expect(first.aggregateId).toBe('p-1');
-    expect(first.aggregateType).toBe('Patient');
-    expect(first.type).toBe('PatientDeceased');
+    expect(publisher.publishAll).not.toHaveBeenCalled();
   });
 });

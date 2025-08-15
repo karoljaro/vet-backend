@@ -16,7 +16,7 @@ export async function activateOwner(
     uow: UnitOfWork;
   }
 ) {
-  const { repo, publisher, outbox, uow } = deps;
+  const { repo, publisher: _publisher, outbox, uow } = deps;
 
   await uow.withTransaction(async (tx) => {
     const { entity } = await repo.getById(id, tx);
@@ -26,8 +26,5 @@ export async function activateOwner(
 
     const envelopes = mapDomainEventsToEnvelopes(entity.pullDomainEvents(), id, 'Owner');
     await outbox.append(envelopes, tx);
-    uow.afterCommit?.(async () => {
-      await publisher.publishAll(envelopes);
-    });
   });
 }
