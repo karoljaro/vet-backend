@@ -55,3 +55,17 @@ export function isDomainAppError(
 ): e is Extract<ApplicationError, { kind: 'domain' }> {
   return e.kind === 'domain';
 }
+
+export class ConcurrencyError extends Error {
+  constructor(
+    public readonly aggregateId: string,
+    public readonly expected: number,
+    public readonly actual?: number
+  ) {
+    super(
+      `ConcurrencyError: aggregate ${aggregateId} expected version ${expected}` +
+        (actual !== undefined ? ` but found ${actual}` : '')
+    );
+    this.name = 'ConcurrencyError';
+  }
+}

@@ -13,7 +13,8 @@ export async function markPatientDeceased(
     const { entity: patient } = await repo.getById(id, tx);
 
     patient.markAsDeceased();
-    await repo.save(patient, tx);
+    const expectedVersion = patient.version; // optimistic concurrency baseline before mutation
+    await repo.save(patient, tx, expectedVersion);
 
     const envelopes = mapDomainEventsToEnvelopes(patient.pullDomainEvents(), id, 'Patient', {
       aggregateVersion: patient.version,

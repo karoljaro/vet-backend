@@ -15,7 +15,7 @@ describe('Owner activate/deactivate (app)', () => {
     const owner = makeOwner();
     const repo = {
       getById: vi.fn(async () => ({ entity: owner })),
-      save: vi.fn(async () => {}),
+      save: vi.fn(async (_entity: any, _tx: any, _expected?: number) => {}),
     };
 
     const uow = new NoopUnitOfWork();

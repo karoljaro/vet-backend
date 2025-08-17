@@ -12,7 +12,8 @@ export async function activateOwner(
     const { entity } = await repo.getById(id, tx);
 
     entity.activate();
-    await repo.save(entity, tx);
+    const expectedVersion = entity.version; // optimistic concurrency baseline before mutation
+    await repo.save(entity, tx, expectedVersion);
 
     const envelopes = mapDomainEventsToEnvelopes(entity.pullDomainEvents(), id, 'Owner', {
       aggregateVersion: entity.version,

@@ -21,7 +21,7 @@ describe('markPatientDeceased (app)', () => {
     const patient = makePatient();
     const repo = {
       getById: vi.fn(async () => ({ entity: patient })),
-      save: vi.fn(async () => {}),
+      save: vi.fn(async (_entity: any, _tx: any, _expected?: number) => {}),
     };
 
     const uow = new NoopUnitOfWork();
