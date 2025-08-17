@@ -14,7 +14,9 @@ export async function deactivateOwner(
     entity.deactivate();
     await repo.save(entity, tx);
 
-    const envelopes = mapDomainEventsToEnvelopes(entity.pullDomainEvents(), id, 'Owner');
+    const envelopes = mapDomainEventsToEnvelopes(entity.pullDomainEvents(), id, 'Owner', {
+      aggregateVersion: entity.version,
+    });
     await outbox.append(envelopes, tx);
   });
 }

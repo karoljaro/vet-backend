@@ -20,7 +20,7 @@ describe('mapDomainEventsToEnvelopes', () => {
       ev('OwnerDeactivated', occurred2),
     ];
 
-    const envelopes = mapDomainEventsToEnvelopes(events, 'o-1', 'Owner');
+    const envelopes = mapDomainEventsToEnvelopes(events, 'o-1', 'Owner', { aggregateVersion: 5 });
 
     expect(envelopes.length).toBe(2);
     // order preserved
@@ -31,6 +31,7 @@ describe('mapDomainEventsToEnvelopes', () => {
       expect(env.aggregateType).toBe('Owner');
       expect(typeof env.envelopeId).toBe('string');
       expect(env.envelopeId).toHaveLength(36); // uuid v4 length
+      expect(env.aggregateVersion).toBe(5);
     }
     // occurredAt propagated
     expect(envelopes[0]!.occurredAt).toBe(occurred1);
@@ -40,7 +41,7 @@ describe('mapDomainEventsToEnvelopes', () => {
   });
 
   it('returns empty array for no events', () => {
-    const envelopes = mapDomainEventsToEnvelopes([], 'o-1', 'Owner');
+    const envelopes = mapDomainEventsToEnvelopes([], 'o-1', 'Owner', { aggregateVersion: 1 });
     expect(envelopes).toEqual([]);
   });
 
@@ -49,7 +50,11 @@ describe('mapDomainEventsToEnvelopes', () => {
     let i = 0;
     const idGen = { uuid: () => ids[i++]! };
     const events: FakeDomainEvent[] = [ev('OwnerActivated'), ev('OwnerDeactivated')];
-    const envelopes = mapDomainEventsToEnvelopes(events, 'o-1', 'Owner', { idGen });
+    const envelopes = mapDomainEventsToEnvelopes(events, 'o-1', 'Owner', {
+      idGen,
+      aggregateVersion: 10,
+    });
+    expect(envelopes.every((e) => e.aggregateVersion === 10)).toBe(true);
     expect(envelopes.map((e) => e.envelopeId)).toEqual(ids);
   });
 });

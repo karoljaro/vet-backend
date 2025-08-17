@@ -15,7 +15,9 @@ export async function markPatientDeceased(
     patient.markAsDeceased();
     await repo.save(patient, tx);
 
-    const envelopes = mapDomainEventsToEnvelopes(patient.pullDomainEvents(), id, 'Patient');
+    const envelopes = mapDomainEventsToEnvelopes(patient.pullDomainEvents(), id, 'Patient', {
+      aggregateVersion: patient.version,
+    });
     await outbox.append(envelopes, tx);
   });
 }
