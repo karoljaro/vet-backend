@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { InMemoryOutboxRepository } from '@/app/_shared/outbox/in-memory-outbox.repository';
-import { InMemoryOutboxDispatcher } from '@/app/_shared/outbox/dispatcher/in-memory-outbox-dispatcher';
+import { InMemoryOutboxRepository } from '@/infra/in-memory/outbox/in-memory-outbox.repository';
+import { InMemoryOutboxDispatcher } from '@/infra/in-memory/outbox/dispatcher/in-memory-outbox-dispatcher';
 import type { EventEnvelope } from '@/app/_shared/events';
 
 let _seq = 0;
