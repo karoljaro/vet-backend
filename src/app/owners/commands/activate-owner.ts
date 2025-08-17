@@ -11,8 +11,9 @@ export async function activateOwner(
   await uow.withTransaction(async (tx) => {
     const { entity } = await repo.getById(id, tx);
 
+    const expectedVersion = entity.version; // capture version BEFORE mutation
+    
     entity.activate();
-    const expectedVersion = entity.version; // optimistic concurrency baseline before mutation
     await repo.save(entity, tx, expectedVersion);
 
     const envelopes = mapDomainEventsToEnvelopes(entity.pullDomainEvents(), id, 'Owner', {

@@ -29,5 +29,10 @@ describe('Owner activate/deactivate (app)', () => {
 
     expect(repo.getById).toHaveBeenCalledTimes(2);
     expect(repo.save).toHaveBeenCalledTimes(2);
+    // Check optimistic concurrency argument usage (expectedVersion < current version after mutation)
+    const firstCallArgs = repo.save.mock.calls[0]!;
+    const secondCallArgs = repo.save.mock.calls[1]!;
+    expect(firstCallArgs[2]).toBe(1); // initial version before first mutate
+    expect(secondCallArgs[2]).toBe(2); // version before re-activate (after first mutation incremented to 2, passes 2 before second mutation)
   });
 });

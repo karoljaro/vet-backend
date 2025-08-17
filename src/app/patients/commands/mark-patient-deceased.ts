@@ -12,8 +12,9 @@ export async function markPatientDeceased(
   await uow.withTransaction(async (tx) => {
     const { entity: patient } = await repo.getById(id, tx);
 
+    const expectedVersion = patient.version; // capture version BEFORE mutation
+    
     patient.markAsDeceased();
-    const expectedVersion = patient.version; // optimistic concurrency baseline before mutation
     await repo.save(patient, tx, expectedVersion);
 
     const envelopes = mapDomainEventsToEnvelopes(patient.pullDomainEvents(), id, 'Patient', {

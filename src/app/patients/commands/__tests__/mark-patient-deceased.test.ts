@@ -34,5 +34,7 @@ describe('markPatientDeceased (app)', () => {
 
     expect(repo.getById).toHaveBeenCalledOnce();
     expect(repo.save).toHaveBeenCalledOnce();
+    const callArgs = repo.save.mock.calls[0]!;
+    expect(callArgs[2]).toBe(1); // initial version before mutation
   });
 });
