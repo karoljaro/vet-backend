@@ -21,7 +21,7 @@ export interface IdGenerator {
 
 export interface PatientRepository {
   getById(id: PatientId, ctx?: TransactionContext): Promise<{ entity: Patient }>;
-  save(entity: Patient, ctx?: TransactionContext): Promise<void>;
+  save(entity: Patient, ctx?: TransactionContext, expectedVersion?: number): Promise<void>;
 }
 
 // EventPublisher pozostaje portem ale nie jest aktualnie używany w command handlerach
@@ -37,5 +37,5 @@ export interface OutboxRepository {
 
 export interface OwnerRepository {
   getById(id: OwnerId, ctx?: TransactionContext): Promise<{ entity: Owner }>;
-  save(entity: Owner, ctx?: TransactionContext): Promise<void>;
+  save(entity: Owner, ctx?: TransactionContext, expectedVersion?: number): Promise<void>;
 }

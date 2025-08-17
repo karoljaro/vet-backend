@@ -21,7 +21,7 @@ describe('markPatientDeceased (app)', () => {
     const patient = makePatient();
     const repo = {
       getById: vi.fn(async () => ({ entity: patient })),
-      save: vi.fn(async () => {}),
+      save: vi.fn(async (_entity: any, _tx: any, _expected?: number) => {}),
     };
 
     const uow = new NoopUnitOfWork();
@@ -34,5 +34,7 @@ describe('markPatientDeceased (app)', () => {
 
     expect(repo.getById).toHaveBeenCalledOnce();
     expect(repo.save).toHaveBeenCalledOnce();
+    const callArgs = repo.save.mock.calls[0]!;
+    expect(callArgs[2]).toBe(1); // initial version before mutation
   });
 });

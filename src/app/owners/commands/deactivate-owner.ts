@@ -10,11 +10,13 @@ export async function deactivateOwner(
 
   await uow.withTransaction(async (tx) => {
     const { entity } = await repo.getById(id, tx);
-
+    const expectedVersion = entity.version; // capture version BEFORE mutation
     entity.deactivate();
-    await repo.save(entity, tx);
+    await repo.save(entity, tx, expectedVersion);
 
-    const envelopes = mapDomainEventsToEnvelopes(entity.pullDomainEvents(), id, 'Owner');
+    const envelopes = mapDomainEventsToEnvelopes(entity.pullDomainEvents(), id, 'Owner', {
+      aggregateVersion: entity.version,
+    });
     await outbox.append(envelopes, tx);
   });
 }

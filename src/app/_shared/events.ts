@@ -6,5 +6,6 @@ export interface EventEnvelope {
   readonly occurredAt: Date;
   readonly aggregateId: string;
   readonly aggregateType: AggregateType;
+  readonly aggregateVersion?: number; // version of aggregate AFTER applying the event batch
   readonly payload?: unknown;
 }
