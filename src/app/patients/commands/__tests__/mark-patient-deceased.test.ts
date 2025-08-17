@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { markPatientDeceased } from '@/app/patients/commands/mark-patient-deceased';
-import { NoopUnitOfWork } from '@/app/_shared/ports';
-import { InMemoryOutboxRepository } from '@/app/_shared/outbox/in-memory-outbox.repository';
+import { NoopUnitOfWork } from '@/infra/in-memory/uow/noop-unit-of-work';
+import { InMemoryOutboxRepository } from '@/infra/in-memory/outbox/in-memory-outbox.repository';
 import { Patient } from '@/domain/patients';
 import { asPatientId } from '@/domain/patients/types/patient.types';
 import { asOwnerId } from '@/domain/owners/types/owner.types';
@@ -23,7 +23,6 @@ describe('markPatientDeceased (app)', () => {
       getById: vi.fn(async () => ({ entity: patient })),
       save: vi.fn(async () => {}),
     };
-    // publisher usunięty z handlerów
 
     const uow = new NoopUnitOfWork();
     const outbox = new InMemoryOutboxRepository();
@@ -35,6 +34,5 @@ describe('markPatientDeceased (app)', () => {
 
     expect(repo.getById).toHaveBeenCalledOnce();
     expect(repo.save).toHaveBeenCalledOnce();
-    // brak publishera
   });
 });

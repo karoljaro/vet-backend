@@ -39,10 +39,3 @@ export interface OwnerRepository {
   getById(id: OwnerId, ctx?: TransactionContext): Promise<{ entity: Owner }>;
   save(entity: Owner, ctx?: TransactionContext): Promise<void>;
 }
-
-// TEMP: in-memory placeholder; move to infra + tests layer later
-export class NoopUnitOfWork implements UnitOfWork {
-  async withTransaction<T>(fn: (ctx: TransactionContext) => Promise<T>): Promise<T> {
-    return fn({} as TransactionContext);
-  }
-}
