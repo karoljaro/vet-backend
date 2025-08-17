@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { activateOwner } from '@/app/owners/commands/activate-owner';
 import { deactivateOwner } from '@/app/owners/commands/deactivate-owner';
-import { NoopUnitOfWork } from '@/app/_shared/ports';
-import { InMemoryOutboxRepository } from '@/app/_shared/outbox/in-memory-outbox.repository';
+import { NoopUnitOfWork } from '@/infra/in-memory/uow/noop-unit-of-work';
+import { InMemoryOutboxRepository } from '@/infra/in-memory/outbox/in-memory-outbox.repository';
 import { Owner } from '@/domain/owners';
 import { asOwnerId } from '@/domain/owners/types/owner.types';
 
@@ -17,7 +17,6 @@ describe('Owner activate/deactivate (app)', () => {
       getById: vi.fn(async () => ({ entity: owner })),
       save: vi.fn(async () => {}),
     };
-    // publisher usunięty z handlerów – test już go nie przekazuje
 
     const uow = new NoopUnitOfWork();
     const outbox = new InMemoryOutboxRepository();
@@ -30,6 +29,5 @@ describe('Owner activate/deactivate (app)', () => {
 
     expect(repo.getById).toHaveBeenCalledTimes(2);
     expect(repo.save).toHaveBeenCalledTimes(2);
-    // brak publishera – sprawdzamy tylko outbox
   });
 });
