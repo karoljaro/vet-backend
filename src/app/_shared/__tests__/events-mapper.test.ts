@@ -57,4 +57,12 @@ describe('mapDomainEventsToEnvelopes', () => {
     expect(envelopes.every((e) => e.aggregateVersion === 10)).toBe(true);
     expect(envelopes.map((e) => e.envelopeId)).toEqual(ids);
   });
+
+  it('omits aggregateVersion when not provided', () => {
+    const events: FakeDomainEvent[] = [ev('OwnerActivated'), ev('OwnerDeactivated')];
+    const envelopes = mapDomainEventsToEnvelopes(events, 'o-1', 'Owner');
+    expect(envelopes).toHaveLength(2);
+    expect('aggregateVersion' in envelopes[0]!).toBe(false);
+    expect('aggregateVersion' in envelopes[1]!).toBe(false);
+  });
 });
