@@ -57,4 +57,16 @@ describe('Owner Entity', () => {
     // drained
     expect(o.pullDomainEvents()).toHaveLength(0);
   });
+
+  it('returns a copy when draining events (defensive copy)', () => {
+    const o = Owner.create(asOwnerId('owner-5'), { name: 'Kasia' });
+    o.deactivate();
+    const events = o.pullDomainEvents();
+    expect(events).toHaveLength(1);
+    // Mutate returned array
+    (events as any).push({ type: 'Fake', occurredAt: new Date(0) });
+    // Next drain should be empty (internal buffer was cleared) and not contain mutation
+    const next = o.pullDomainEvents();
+    expect(next).toHaveLength(0);
+  });
 });
