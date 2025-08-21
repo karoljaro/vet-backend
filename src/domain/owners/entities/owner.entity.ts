@@ -12,6 +12,7 @@ import {
   OwnerAlreadyInactiveError,
   DomainEvent,
 } from '@/domain/shared';
+import { resolveNow, TimeDeps } from '@/domain/shared/resolve-now';
 
 export class Owner {
   private _events: DomainEvent[] = [];
@@ -20,12 +21,12 @@ export class Owner {
     private _props: OwnerProps
   ) {}
 
-  static create(id: OwnerId, props: CreateOwnerProps): Owner {
+  static create(id: OwnerId, props: CreateOwnerProps, deps?: TimeDeps): Owner {
     OwnerBusinessValidator.validateName(props.name);
     OwnerBusinessValidator.validateEmail(props.email);
     OwnerBusinessValidator.validatePhone(props.phone);
 
-    const now = new Date();
+    const now = resolveNow(deps);
     const domainProps: OwnerProps = Object.freeze({
       name: props.name.trim(),
       ...(props.email !== undefined ? { email: props.email } : {}),
@@ -42,7 +43,7 @@ export class Owner {
     return owner;
   }
 
-  update(updates: UpdateOwnerProps): void {
+  update(updates: UpdateOwnerProps, deps?: TimeDeps): void {
     OwnerBusinessValidator.validateName(updates.name ?? this._props.name);
     if (updates.email !== undefined) OwnerBusinessValidator.validateEmail(updates.email);
     if (updates.phone !== undefined) OwnerBusinessValidator.validatePhone(updates.phone);
@@ -53,7 +54,7 @@ export class Owner {
       ...(updates.email !== undefined ? { email: updates.email } : {}),
       ...(updates.phone !== undefined ? { phone: updates.phone } : {}),
       ...(updates.address !== undefined ? { address: updates.address } : {}),
-      updatedAt: new Date(),
+      updatedAt: resolveNow(deps),
       version: this._props.version + 1,
     });
 
@@ -61,27 +62,29 @@ export class Owner {
     this._props = newProps;
   }
 
-  deactivate(): void {
+  deactivate(deps?: TimeDeps): void {
     if (this._props.status === 'inactive') {
       throw new OwnerAlreadyInactiveError();
     }
-    this.transitionStatus('inactive');
-    this._events.push({ type: 'OwnerDeactivated', occurredAt: new Date() });
+    const now = resolveNow(deps);
+    this.transitionStatus('inactive', { now: () => now });
+    this._events.push({ type: 'OwnerDeactivated', occurredAt: now });
   }
 
-  activate(): void {
+  activate(deps?: TimeDeps): void {
     if (this._props.status === 'active') {
       throw new OwnerAlreadyActiveError();
     }
-    this.transitionStatus('active');
-    this._events.push({ type: 'OwnerActivated', occurredAt: new Date() });
+    const now = resolveNow(deps);
+    this.transitionStatus('active', { now: () => now });
+    this._events.push({ type: 'OwnerActivated', occurredAt: now });
   }
 
-  private transitionStatus(status: OwnerStatus): void {
+  private transitionStatus(status: OwnerStatus, deps?: TimeDeps): void {
     const newProps: OwnerProps = Object.freeze({
       ...this._props,
       status,
-      updatedAt: new Date(),
+      updatedAt: resolveNow(deps),
       version: this._props.version + 1,
     });
     Owner.ensureTimestampsOrder(newProps.createdAt, newProps.updatedAt);

@@ -14,6 +14,7 @@ import {
   PatientUpdateNotAllowedError,
   DomainEvent,
 } from '@/domain/shared';
+import { resolveNow, TimeDeps } from '@/domain/shared/resolve-now';
 
 export class Patient {
   private props: Readonly<PatientProps>;
@@ -27,9 +28,10 @@ export class Patient {
     this.props = Object.freeze({ ...props });
   }
 
-  static create(id: PatientId, createProps: CreatePatientProps): Patient {
+  static create(id: PatientId, createProps: CreatePatientProps, deps?: TimeDeps): Patient {
     PatientInvariantsValidator.validateCreateProps(createProps);
 
+  const now = resolveNow(deps);
     const props: PatientProps = {
       name: createProps.name,
       species: createProps.species,
@@ -40,8 +42,8 @@ export class Patient {
       ...(createProps.weight !== undefined ? { weight: createProps.weight } : {}),
       ...(createProps.photoUrl !== undefined ? { photoUrl: createProps.photoUrl } : {}),
       status: 'active',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: now,
+      updatedAt: now,
       version: 1,
     };
 
@@ -87,18 +89,19 @@ export class Patient {
   }
 
   // Business methods
-  updateBasicInfo(updates: UpdatePatientBasicInfoProps): void {
+  updateBasicInfo(updates: UpdatePatientBasicInfoProps, deps?: TimeDeps): void {
     if (this.isDeceased()) {
       throw new PatientUpdateNotAllowedError();
     }
 
+  const now = resolveNow(deps);
     const next: PatientProps = {
       ...this.props,
       ...(updates.name !== undefined ? { name: updates.name } : {}),
       ...(updates.breed !== undefined ? { breed: updates.breed } : {}),
       ...(updates.weight !== undefined ? { weight: updates.weight } : {}),
       ...(updates.photoUrl !== undefined ? { photoUrl: updates.photoUrl } : {}),
-      updatedAt: new Date(),
+      updatedAt: now,
       version: this.props.version + 1,
     };
 
@@ -106,21 +109,22 @@ export class Patient {
     this.props = Object.freeze({ ...next });
   }
 
-  markAsDeceased(): void {
+  markAsDeceased(deps?: TimeDeps): void {
     if (this.isDeceased()) {
       throw new PatientAlreadyDeceasedError();
     }
+  const now = resolveNow(deps);
     const next: PatientProps = {
       ...this.props,
       status: 'deceased',
-      updatedAt: new Date(),
+      updatedAt: now,
       version: this.props.version + 1,
     };
     PatientInvariantsValidator.validatePatientProps(next);
     this.props = Object.freeze({ ...next });
     this._events.push({
       type: 'PatientDeceased',
-      occurredAt: new Date(),
+      occurredAt: now,
     });
   }
 
