@@ -32,6 +32,16 @@ const domainHttpStatus: Record<string, number> = {
 };
 
 export function toApplicationError(err: unknown): ApplicationError {
+  // Concurrency conflicts are not DomainError subclasses today; treat explicitly.
+  if (err instanceof ConcurrencyError) {
+    return {
+      kind: 'domain',
+      code: 'CONCURRENCY_CONFLICT',
+      message: err.message,
+      httpStatus: 409,
+      original: err as unknown as DomainError,
+    };
+  }
   if (err instanceof DomainError) {
     return {
       kind: 'domain',
