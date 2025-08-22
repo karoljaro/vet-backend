@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { InvalidPatientNameError, OwnerAlreadyActiveError } from '@/domain/shared';
-import { toApplicationError, isDomainAppError } from '@/app/_shared/errors';
+import { toApplicationError, isDomainAppError, ConcurrencyError } from '@/app/_shared/errors';
 
 describe('toApplicationError', () => {
   it('maps domain error with proper status', () => {
@@ -22,5 +22,13 @@ describe('toApplicationError', () => {
     const appErr = toApplicationError(new Error('boom'));
     expect(appErr.kind).toBe('unexpected');
     expect(appErr.httpStatus).toBe(500);
+  });
+
+  it('maps ConcurrencyError to domain conflict 409', () => {
+    const err = new ConcurrencyError('agg-1', 2, 3);
+    const appErr = toApplicationError(err);
+    expect(appErr.kind).toBe('domain');
+    expect(appErr.code).toBe('CONCURRENCY_CONFLICT');
+    expect(appErr.httpStatus).toBe(409);
   });
 });
