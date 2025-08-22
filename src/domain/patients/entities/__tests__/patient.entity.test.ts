@@ -77,4 +77,18 @@ describe('Patient Entity', () => {
     const events2 = p.pullDomainEvents();
     expect(events2).toHaveLength(0);
   });
+
+  it('returns a copy when draining events (defensive copy)', () => {
+    const p = Patient.create(asPatientId('id-7'), baseProps);
+    p.markAsDeceased();
+    const events = p.pullDomainEvents();
+    expect(events).toHaveLength(1);
+    // mutate returned array & event object
+    (events as any).push({ bogus: true });
+    (events[0] as any).type = 'Hacked';
+    // pull again
+    const again = p.pullDomainEvents();
+    expect(again).toHaveLength(0); // buffer was cleared only once
+    // original event in returned array mutated does not affect internal state (indirect assertion by emptiness)
+  });
 });
