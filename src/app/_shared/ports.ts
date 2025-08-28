@@ -1,4 +1,4 @@
-import type { PatientId } from '@/domain/patients/types';
+import type { CreatePatientProps, PatientId } from '@/domain/patients/types';
 import type { Patient } from '@/domain/patients';
 import type { OwnerId } from '@/domain/owners/types/owner.types';
 import type { Owner } from '@/domain/owners';
@@ -22,6 +22,8 @@ export interface IdGenerator {
 export interface PatientRepository {
   getById(id: PatientId, ctx?: TransactionContext): Promise<{ entity: Patient }>;
   save(entity: Patient, ctx?: TransactionContext, expectedVersion?: number): Promise<void>;
+  create(props: CreatePatientProps, ctx?: TransactionContext): Promise<{ entity: Patient }>;
+  getAll(): Promise<Patient[]>;
 }
 
 // EventPublisher pozostaje portem ale nie jest aktualnie używany w command handlerach

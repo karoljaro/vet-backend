@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { markPatientDeceased } from '@/app/patients/commands/mark-patient-deceased';
+import { markPatientDeceased } from '../mark-patient-deceased.command';
 import { NoopUnitOfWork } from '@/infra/in-memory/uow/noop-unit-of-work';
 import { InMemoryOutboxRepository } from '@/infra/in-memory/outbox/in-memory-outbox.repository';
 import { Patient } from '@/domain/patients';
@@ -22,6 +22,8 @@ describe('markPatientDeceased (app)', () => {
     const repo = {
       getById: vi.fn(async () => ({ entity: patient })),
       save: vi.fn(async (_entity: any, _tx: any, _expected?: number) => {}),
+      create: vi.fn(), // mock, does not apply
+      getAll: vi.fn(), // mock, does not apply
     };
 
     const uow = new NoopUnitOfWork();
