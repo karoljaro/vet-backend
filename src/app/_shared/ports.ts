@@ -23,6 +23,7 @@ export interface PatientRepository {
   getById(id: PatientId, ctx?: TransactionContext): Promise<{ entity: Patient }>;
   save(entity: Patient, ctx?: TransactionContext, expectedVersion?: number): Promise<void>;
   create(props: CreatePatientProps, ctx?: TransactionContext): Promise<{ entity: Patient }>;
+  getAll(): Promise<Patient[]>;
 }
 
 // EventPublisher pozostaje portem ale nie jest aktualnie używany w command handlerach
