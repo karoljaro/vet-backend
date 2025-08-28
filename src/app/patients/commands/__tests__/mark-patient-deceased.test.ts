@@ -22,6 +22,8 @@ describe('markPatientDeceased (app)', () => {
     const repo = {
       getById: vi.fn(async () => ({ entity: patient })),
       save: vi.fn(async (_entity: any, _tx: any, _expected?: number) => {}),
+      create: vi.fn(), // mock, does not apply
+      getAll: vi.fn(), // mock, does not apply
     };
 
     const uow = new NoopUnitOfWork();
