@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { markPatientDeceased } from '@/app/patients/commands/mark-patient-deceased';
+import { markPatientDeceased } from '../mark-patient-deceased.command';
 import { NoopUnitOfWork } from '@/infra/in-memory/uow/noop-unit-of-work';
 import { InMemoryOutboxRepository } from '@/infra/in-memory/outbox/in-memory-outbox.repository';
 import { Patient } from '@/domain/patients';
